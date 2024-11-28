@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +14,56 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1rem;
+  color: #37362f;
+}
+.fc .fc-button-primary {
+  font-size: 0.75rem;
+  background-color: #ffffff00;
+  color: #acaba9;
+  border: none;
+  outline: none;
+}
+.fc .fc-today-button {
+  background-color: #ffffff00;
+  color: #37362f;
+  border: none;
+  outline: none;
+}
+.fc .fc-button-primary:not(:disabled):active,
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #ffffff00;
+  color: #acaba9;
+  box-shadow: none;
+}
+.fc .fc-button-primary:not(:disabled):focus,
+.fc .fc-button-primary:not(:disabled).fc-button-focus {
+  background-color: #ffffff00;
+  color: #acaba9;
+  box-shadow: none;
+}
+.fc .fc-today-button:disabled {
+  opacity: 1;
+}
+
+.fc .fc-col-header-cell {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #b6b5b3;
+  border: none;
+}
+
+.fc .fc-scrollgrid {
+  border-width: 0;
+}
+
+.fc .fc-scrollgrid-section > * {
+  border: none;
+}
+
+.fc .fc-scrollgrid-sync-table {
+  border: 1px;
 }
