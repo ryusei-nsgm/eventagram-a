@@ -16,6 +16,10 @@ code {
     monospace;
 }
 
+.fc-daygrid-day-frame {
+  background-color: white;
+}
+
 .fc .fc-toolbar-title {
   font-size: 1rem;
   color: #37362f;

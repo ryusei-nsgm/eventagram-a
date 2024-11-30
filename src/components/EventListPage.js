@@ -16,6 +16,10 @@ const EventListPage = () => {
       </Link>
       <h1 className="text-3xl font-bold text-center mb-8">{formattedDate}</h1>
 
+      <Link to="/form" className="fixed top-8 right-8 bg-green-400 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md">
+        <span className="text-3xl">+</span>
+      </Link>
+
       {/* TODO: Firebaseから該当の日付のイベントを取得して表示する */}
       <div className="p-4 bg-white rounded-lg shadow">
         <p>該当するイベントがありません。</p>
