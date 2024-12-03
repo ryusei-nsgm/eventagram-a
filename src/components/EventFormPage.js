@@ -80,20 +80,18 @@ const EventFormPage = () => {
           />
         </div>
 
-        {/* 詳細 */}
+        {/* 場所 */}
         <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-700 font-medium"
-          >
-            詳細
+          <label htmlFor="location" className="block text-gray-700 font-medium">
+            場所
           </label>
-          <textarea
-            id="description"
+          <input
+            id="location"
+            type="text"
             className="border rounded w-full p-2 mt-2"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={140}
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
           />
         </div>
 
@@ -159,6 +157,23 @@ const EventFormPage = () => {
               popperPlacement="bottom-start"
             />
           </div>
+        </div>
+
+        {/* 詳細 */}
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-gray-700 font-medium"
+          >
+            詳細
+          </label>
+          <textarea
+            id="description"
+            className="border rounded w-full p-2 mt-2"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            maxLength={140}
+          />
         </div>
 
         {/* リンク */}
