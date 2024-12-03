@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from "../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { registerLocale } from "react-datepicker";
 import ja from "date-fns/locale/ja";
 import Modal from './Modal';
@@ -11,6 +11,7 @@ registerLocale("ja", ja);
 
 const EventFormPage = () => {
   const [eventName, setEventName] = useState("");
+  const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -28,13 +29,14 @@ const EventFormPage = () => {
     e.preventDefault();
     const eventData = {
       eventName,
+      location,
       description,
-      startDate: startDate ? startDate.toISOString() : null,
-      endDate: useEndDate && endDate ? endDate.toISOString() : null,
+      startDate: Timestamp.fromDate(new Date(startDate)),
+      endDate: endDate ? Timestamp.fromDate(new Date(endDate)) : Timestamp.fromDate(new Date(startDate)),
       link,
       organizer: organizer || "匿名",
-      createdAt: createdAt.toISOString(),
-      updatedAt: updatedAt.toISOString(),
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     };
 
     try {
