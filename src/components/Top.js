@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react"; // FullCalendarのインポート
 import dayGridPlugin from "@fullcalendar/daygrid"; // 日付表示のためのプラグイン
 import interactionPlugin from '@fullcalendar/interaction';
@@ -16,7 +16,17 @@ const Top = () => {
 
   return (
     <div className="min-h-screen p-4 bg-gray-100 text-gray-900">
-      <h1 className="text-3xl font-bold text-center mb-8">いべんたぐらむ</h1>
+      <h1 className="text-3xl text-center mt-4 mb-4">いべんたぐらむ</h1>
+
+      <Link
+        to="/form"
+        className="fixed top-8 right-4 bg-green-400 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md"
+      >
+        <span className="text-2xl">+</span>
+      </Link>
+
+      <p className="text-xs text-center mb-2">日付からイベントを検索</p>
+      <p className="text-xs text-center mb-4">まずは暇な日をタップ</p>
       
       {/* FullCalendar コンポーネント */}
       <FullCalendar
@@ -29,7 +39,7 @@ const Top = () => {
           center: "title",
           right: "next",
         }}
-        events={[]} // TODO: Firebaseに登録されているイベントを格納
+        events={[]}
         dateClick={handleDateClick}
         locale="ja"
         height="auto"
