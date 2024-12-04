@@ -6,22 +6,28 @@ import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { registerLocale } from "react-datepicker";
 import ja from "date-fns/locale/ja";
 import Modal from './Modal';
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 registerLocale("ja", ja);
 
 const EventFormPage = () => {
   const [eventName, setEventName] = useState("");
-  const [location, setLocation] = useState("");
+  const [venue, setVenue] = useState("");
   const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [useEndDate, setUseEndDate] = useState(false);
-
   const [link, setLink] = useState("");
   const [organizer, setOrganizer] = useState("");
-
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+
+  const navigate = useNavigate();
+
+  // イベント一覧の日付を受け取り開催日の初期値に設定
+  const location = useLocation();
+  const passedDate = location.state?.date ? new Date(location.state.date) : null;
+  const [startDate, setStartDate] = useState(passedDate || null);
+
   const createdAt = new Date();
   const updatedAt = new Date();
 
@@ -29,29 +35,21 @@ const EventFormPage = () => {
     e.preventDefault();
     const eventData = {
       eventName,
-      location,
+      venue,
       description,
       startDate: Timestamp.fromDate(new Date(startDate)),
       endDate: endDate ? Timestamp.fromDate(new Date(endDate)) : Timestamp.fromDate(new Date(startDate)),
       link,
       organizer: organizer || "匿名",
-      createdAt: createdAt,
-      updatedAt: updatedAt,
+      createdAt,
+      updatedAt,
     };
 
     try {
       const docRef = await addDoc(collection(db, "events"), eventData);
       setModalMessage('イベントの登録が完了しました！');
       setShowModal(true);
-
-      // フォームのリセット
-      setEventName("");
-      setDescription("");
-      setStartDate(null);
-      setEndDate(null);
-      setUseEndDate(false);
-      setLink("");
-      setOrganizer("");
+      navigate(`/event/${docRef.id}`);
     } catch (error) {
       console.error("Error adding document: ", error);
       setModalMessage('イベントの登録に失敗しました');
@@ -59,13 +57,24 @@ const EventFormPage = () => {
     }
   };
 
+  // イベント一覧画面の戻り先URL
+  const backUrl = startDate
+    ? `/events/${startDate.toISOString().split("T")[0].slice(0, 10)}`
+    : `/`;
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen p-4 bg-gray-100 text-gray-900">
+      <Link
+        to={backUrl}
+        className="text-gray-800 hover:text-blue-700 text-lg"
+      >
+        &lt;
+      </Link>
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-lg w-full max-w-lg"
+        className="bg-white p-6 rounded shadow-lg w-full max-w-lg mt-4"
       >
-        <h2 className="text-xl font-bold mb-4">イベントを登録</h2>
+        {/* <h2 className="text-xl font-bold mb-4">イベントを登録</h2> */}
 
         {/* イベント名 */}
         <div className="mb-4">
@@ -84,22 +93,21 @@ const EventFormPage = () => {
 
         {/* 場所 */}
         <div className="mb-4">
-          <label htmlFor="location" className="block text-gray-700 font-medium">
+          <label htmlFor="venue" className="block text-gray-700 font-medium">
             場所
           </label>
           <input
-            id="location"
+            id="venue"
             type="text"
             className="border rounded w-full p-2 mt-2"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={venue}
+            onChange={(e) => setVenue(e.target.value)}
             required
           />
         </div>
 
         {/* 開催日と終了日 */}
         <div className="flex items-center space-x-4 mb-4">
-          {/* 開催日 */}
           <div className="flex-1">
             <label htmlFor="startDate" className="block text-gray-700 font-medium mb-2">
               開催日
@@ -116,10 +124,8 @@ const EventFormPage = () => {
             />
           </div>
 
-          {/* 終了日 */}
           <div className="flex-1">
             <div className="flex items-center mb-2">
-              {/* トグルボタン */}
               <div className="relative">
                 <input
                   type="checkbox"
@@ -155,23 +161,20 @@ const EventFormPage = () => {
               locale="ja"
               dateFormat="yyyy/MM/dd"
               className="p-2 border rounded w-full"
-              disabled={!useEndDate}
               popperPlacement="bottom-start"
+              disabled={!useEndDate}
             />
           </div>
         </div>
 
         {/* 詳細 */}
         <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-700 font-medium"
-          >
+          <label htmlFor="description" className="block text-gray-700 font-medium">
             詳細
           </label>
           <textarea
             id="description"
-            className="border rounded w-full p-2 mt-2"
+            className="border rounded w-full p-2 mt-2 h-40"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={140}
@@ -217,7 +220,6 @@ const EventFormPage = () => {
         <Modal message={modalMessage} onClose={() => setShowModal(false)} />
       )}
     </div>
-  
   );
 };
 
