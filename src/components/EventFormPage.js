@@ -74,7 +74,6 @@ const EventFormPage = () => {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-lg w-full max-w-lg mt-4"
       >
-        {/* <h2 className="text-xl font-bold mb-4">イベントを登録</h2> */}
 
         {/* イベント名 */}
         <div className="mb-4">
