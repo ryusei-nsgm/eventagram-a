@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Top from "./components/Top"; // Topコンポーネントをインポート
 import EventListPage from "./components/EventListPage"; // イベント一覧ページコンポーネント
 import EventFormPage from "./components/EventFormPage"; // イベント一覧ページコンポーネント
+import EventDetailPage from "./components/EventDetailPage"; // イベント一覧ページコンポーネント
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         {/* 特定の日付のイベント一覧ページ */}
         <Route path="/events/:date" element={<EventListPage />} />
         <Route path="/form" element={<EventFormPage />} />
+        <Route path="/event/:eventId" element={<EventDetailPage />} />
       </Routes>
     </Router>
   );
