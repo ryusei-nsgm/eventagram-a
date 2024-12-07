@@ -1,20 +1,60 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Top from "./components/Top"; // Topコンポーネントをインポート
-import EventListPage from "./components/EventListPage"; // イベント一覧ページコンポーネント
-import EventFormPage from "./components/EventFormPage"; // イベント一覧ページコンポーネント
-import EventDetailPage from "./components/EventDetailPage"; // イベント一覧ページコンポーネント
+import LoginPage from "./components/LoginPage";
+import Top from "./components/Top";
+import EventListPage from "./components/EventListPage";
+import EventFormPage from "./components/EventFormPage";
+import EventDetailPage from "./components/EventDetailPage";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* トップページ */}
-        <Route path="/" element={<Top />} />
-        {/* 特定の日付のイベント一覧ページ */}
-        <Route path="/events/:date" element={<EventListPage />} />
-        <Route path="/form" element={<EventFormPage />} />
-        <Route path="/event/:eventId" element={<EventDetailPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Top />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/events/:date"
+          element={
+            <PrivateRoute>
+              <EventListPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/form"
+          element={
+            <PrivateRoute>
+              <EventFormPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route 
+          path="/event/edit/:eventId"
+          element={
+            <PrivateRoute>
+              <EventFormPage />
+            </PrivateRoute>
+          } 
+        />
+
+        <Route
+          path="/event/:eventId"
+          element={
+            <PrivateRoute>
+              <EventDetailPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );

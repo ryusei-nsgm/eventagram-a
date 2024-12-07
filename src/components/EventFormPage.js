@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from "../firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, addDoc, Timestamp } from "firebase/firestore";
 import { registerLocale } from "react-datepicker";
 import ja from "date-fns/locale/ja";
 import Modal from './Modal';
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 registerLocale("ja", ja);
 
 const EventFormPage = () => {
+  const { eventId } = useParams(); // 編集時に使用するイベントID
+  const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
+  const uid = currentUser?.uid;
+
   const [eventName, setEventName] = useState("");
   const [venue, setVenue] = useState("");
   const [description, setDescription] = useState("");
@@ -21,7 +27,32 @@ const EventFormPage = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (eventId) {
+        try {
+          const docRef = doc(db, "events", eventId);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setEventName(data.eventName || "");
+            setVenue(data.venue || "");
+            setDescription(data.description || "");
+            setStartDate(data.startDate.toDate() || null);
+            setEndDate(data.endDate?.toDate() || null);
+            setUseEndDate(!!data.endDate);
+            setLink(data.link || "");
+            setOrganizer(data.organizer || "");
+          }
+        } catch (error) {
+          console.error("Error fetching event data: ", error);
+        }
+      }
+    };
+
+    fetchEventData();
+  }, [eventId]);
 
   // イベント一覧の日付を受け取り開催日の初期値に設定
   const location = useLocation();
@@ -33,6 +64,13 @@ const EventFormPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!uid) {
+      setModalMessage('ログインが必要です');
+      setShowModal(true);
+      return;
+    }
+
     const eventData = {
       eventName,
       venue,
@@ -43,16 +81,27 @@ const EventFormPage = () => {
       organizer: organizer || "匿名",
       createdAt,
       updatedAt,
+      uid,
     };
 
     try {
-      const docRef = await addDoc(collection(db, "events"), eventData);
-      setModalMessage('イベントの登録が完了しました！');
+      if (eventId) {
+        // 編集モード：イベントを更新
+        const docRef = doc(db, "events", eventId);
+        await updateDoc(docRef, eventData);
+        setModalMessage("イベントの更新が完了しました！");
+        navigate(`/event/${docRef.id}`);
+      } else {
+        // 登録モード：新規イベントを作成
+        eventData.createdAt = new Date();
+        const docRef = await addDoc(collection(db, "events"), eventData);
+        setModalMessage("イベントの登録が完了しました！");
+        navigate(`/event/${docRef.id}`);
+      }
       setShowModal(true);
-      navigate(`/event/${docRef.id}`);
     } catch (error) {
-      console.error("Error adding document: ", error);
-      setModalMessage('イベントの登録に失敗しました');
+      console.error("Error saving event: ", error);
+      setModalMessage("イベントの保存に失敗しました");
       setShowModal(true);
     }
   };
@@ -86,6 +135,7 @@ const EventFormPage = () => {
             className="border rounded w-full p-2 mt-2"
             value={eventName}
             onChange={(e) => setEventName(e.target.value)}
+            maxLength={30}
             required
           />
         </div>
@@ -101,6 +151,7 @@ const EventFormPage = () => {
             className="border rounded w-full p-2 mt-2"
             value={venue}
             onChange={(e) => setVenue(e.target.value)}
+            maxLength={20}
             required
           />
         </div>
@@ -177,6 +228,7 @@ const EventFormPage = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={140}
+            required
           />
         </div>
 
@@ -191,6 +243,7 @@ const EventFormPage = () => {
             className="border rounded w-full p-2 mt-2"
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            maxLength={2000}
           />
         </div>
 
@@ -205,6 +258,7 @@ const EventFormPage = () => {
             className="border rounded w-full p-2 mt-2"
             value={organizer}
             onChange={(e) => setOrganizer(e.target.value)}
+            maxLength={10}
           />
         </div>
 
@@ -212,7 +266,7 @@ const EventFormPage = () => {
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
         >
-          登録
+          {eventId ? "更新" : "登録"}
         </button>
       </form>
       {showModal && (
