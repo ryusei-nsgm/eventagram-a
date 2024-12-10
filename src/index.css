@@ -71,3 +71,11 @@ code {
 .fc .fc-scrollgrid-sync-table {
   border: 1px;
 }
+
+.fc .fc-daygrid-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100%;
+}
