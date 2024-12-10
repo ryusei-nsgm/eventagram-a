@@ -151,15 +151,15 @@ const EventDetailPage = () => {
               <a
                 href={event.link}
                 target="_blank"
-                  rel="noopener noreferrer"
-                className=" text-blue-500 hover:text-blue-700 flex items-center"
+                rel="noopener noreferrer"
+                className="bg-blue-400 py-2 px-2 rounded-md flex items-center space-x-2 shadow-md"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
-                  stroke="currentColor"
+                  stroke="white"
                   className="size-5"
                 >
                   <path
