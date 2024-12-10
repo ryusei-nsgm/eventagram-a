@@ -90,6 +90,17 @@ const EventDetailPage = () => {
 
   const handleDeleteEvent = async () => {
     try {
+      // イベントに関連するすべてのコメントを取得
+      const commentsQuery = query(collection(db, `events/${eventId}/comments`));
+      const commentsSnapshot = await getDocs(commentsQuery);
+  
+      // すべてのコメントを削除
+      const deleteCommentPromises = commentsSnapshot.docs.map((commentDoc) =>
+        deleteDoc(commentDoc.ref)
+      );
+      await Promise.all(deleteCommentPromises);
+  
+      // イベントを削除
       await deleteDoc(doc(db, "events", eventId));
       setShowModal(false);
       navigate(backUrl);
