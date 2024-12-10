@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { auth, signOut, db } from "../firebase"; // Firestoreのインポート
 import { collection, getDocs } from "firebase/firestore"; // Firestoreのデータ取得
 
@@ -20,7 +20,7 @@ const Top = () => {
           const data = doc.data();
           return {
             start: format(data.startDate.toDate(), "yyyy-MM-dd"),
-            end: format(data.endDate.toDate(), "yyyy-MM-dd"),
+            end: format(addDays(data.endDate.toDate(), 1), "yyyy-MM-dd"),
             color: "#98fb98",
             display: 'background'
           };
