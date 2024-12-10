@@ -91,7 +91,6 @@ const Top = () => {
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         initialDate={new Date()}
-        businessHours={{ daysOfWeek: [1, 2, 3, 4, 5] }}
         headerToolbar={{
           left: "prev",
           center: "title",
@@ -101,6 +100,7 @@ const Top = () => {
         dateClick={handleDateClick}
         locale="ja"
         height="auto"
+        dayCellContent={(args) => args.date.getDate()}
       />
     </div>
   );
