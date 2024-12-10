@@ -1,27 +1,50 @@
-import React, { useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import FullCalendar from "@fullcalendar/react"; // FullCalendarのインポート
-import dayGridPlugin from "@fullcalendar/daygrid"; // 日付表示のためのプラグイン
-import interactionPlugin from '@fullcalendar/interaction';
-import { format } from "date-fns"; // 日付フォーマット用
-import { auth, signOut } from "../firebase";
-import { AuthContext } from "../context/AuthContext";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { format } from "date-fns";
+import { auth, signOut, db } from "../firebase"; // Firestoreのインポート
+import { collection, getDocs } from "firebase/firestore"; // Firestoreのデータ取得
 
 const Top = () => {
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);
+  const [events, setEvents] = useState([]);
 
-  // 日付をクリックしたときにその日付のイベント一覧ページに遷移する処理
+  // Firestoreからイベントを取得
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "events"));
+        const eventData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            start: format(data.startDate.toDate(), "yyyy-MM-dd"),
+            end: format(data.endDate.toDate(), "yyyy-MM-dd"),
+            color: "#98fb98",
+            display: 'background'
+          };
+        });
+        setEvents(eventData);
+      } catch (error) {
+        console.error("イベント取得エラー:", error);
+      }
+    };
+  
+    fetchEvents();
+  }, []);
+
+  // 日付をクリックしたときの処理
   const handleDateClick = (info) => {
-    const formattedDate = format(info.date, "yyyy-MM-dd"); // yyyy-MM-dd形式で日付をフォーマット
-    navigate(`/events/${formattedDate}`); // 選択した日付のイベント一覧ページに遷移
+    const formattedDate = format(info.date, "yyyy-MM-dd");
+    navigate(`/events/${formattedDate}`);
   };
 
   // ログアウト処理
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Firebaseからサインアウト
-      navigate("/login"); // ログインページに遷移
+      await signOut(auth);
+      navigate("/login");
     } catch (error) {
       console.error("ログアウトエラー:", error);
     }
@@ -34,8 +57,20 @@ const Top = () => {
         onClick={handleLogout}
         className="absolute top-4 left-1 flex items-center py-2 px-4"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+        {/* ログアウトアイコン */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="size-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
+          />
         </svg>
       </button>
 
@@ -50,10 +85,10 @@ const Top = () => {
 
       <p className="text-xs text-center mb-2">日付からイベントを検索</p>
       <p className="text-xs text-center mb-4">まずは暇な日をタップ</p>
-      
+
       {/* FullCalendar コンポーネント */}
       <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]} // 日付グリッド表示プラグイン
+        plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         initialDate={new Date()}
         businessHours={{ daysOfWeek: [1, 2, 3, 4, 5] }}
@@ -62,7 +97,7 @@ const Top = () => {
           center: "title",
           right: "next",
         }}
-        events={[]}
+        events={events}
         dateClick={handleDateClick}
         locale="ja"
         height="auto"
