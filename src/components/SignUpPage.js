@@ -12,8 +12,8 @@ const SignupPage = () => {
 
   // パスワードのバリデーション
   const validatePassword = (password) => {
-    const regex = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return regex.test(password); // 8文字以上、英字と数字を含む
+    const regex = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    return regex.test(password); // 6文字以上、英字と数字を含む
   };
 
   const handleSignup = async (e) => {
@@ -27,7 +27,7 @@ const SignupPage = () => {
 
     // パスワードのバリデーション
     if (!validatePassword(password)) {
-      setError("パスワードは8文字以上で、英字と数字を含める必要があります");
+      setError("パスワードは6文字以上で、英字と数字を含める必要があります");
       return;
     }
 
@@ -40,7 +40,7 @@ const SignupPage = () => {
     }
   };
 
-  // モーダルを閉じてログインページへ遷移
+  // モーダルを閉じてログイン
   const handleCloseModal = () => {
     setShowModal(false);
     navigate("/login"); // モーダルを閉じた後、ログインページに遷移
@@ -92,7 +92,7 @@ const SignupPage = () => {
         </form>
 
         <p className="text-xs text-center mt-4 text-gray-500">
-          パスワードは8文字以上で、英字と数字を含める必要があります。
+          パスワードは6文字以上で、英字と数字を含める必要があります。
         </p>
       </div>
 
@@ -106,7 +106,7 @@ const SignupPage = () => {
               onClick={handleCloseModal}
               className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition"
             >
-              ログインページへ
+              ログイン
             </button>
           </div>
         </div>
