@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, signInWithEmailAndPassword } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +7,15 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigate("/");
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
 
   // メールアドレスでのログイン
   const handleEmailLogin = async (e) => {
