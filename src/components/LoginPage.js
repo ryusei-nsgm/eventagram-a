@@ -41,7 +41,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-svh bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
         <h1 className="text-3xl text-center mt-4 mb-8">いべんたぐらむ</h1>
 

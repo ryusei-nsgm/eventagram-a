@@ -122,7 +122,7 @@ const EventFormPage = () => {
     : `/`;
 
   return (
-    <div className="min-h-screen p-4 bg-gray-100 text-gray-900">
+    <div className="min-h-svh p-4 bg-gray-100 text-gray-900">
       <Link
         to={backUrl}
         className="text-gray-800 hover:text-blue-700 text-lg"
