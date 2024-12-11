@@ -112,6 +112,7 @@ const Top = () => {
         locale="ja"
         height="auto"
         dayCellContent={(args) => args.date.getDate()}
+        fixedWeekCount={false}
       />
       {isAnonymous && (
         <p className="text-sm text-center mt-4 text-red-800">※イベントの登録は<a href="/signup" className="text-blue-500">サインアップ</a>が必要です</p>
