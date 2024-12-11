@@ -4,12 +4,13 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { format, addDays } from "date-fns";
-import { auth, signOut, db } from "../firebase"; // Firestoreのインポート
-import { collection, getDocs } from "firebase/firestore"; // Firestoreのデータ取得
+import { auth, signOut, db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Top = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   // Firestoreからイベントを取得
   useEffect(() => {
@@ -32,6 +33,15 @@ const Top = () => {
     };
   
     fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsAnonymous(user.isAnonymous); // 匿名ログインかを判定
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   // 日付をクリックしたときの処理
@@ -75,13 +85,14 @@ const Top = () => {
       </button>
 
       <h1 className="text-3xl text-center mt-4 mb-4">いべんたぐらむ</h1>
-
-      <Link
-        to="/form"
-        className="fixed top-8 right-4 bg-green-400 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md"
-      >
-        <span className="text-2xl">+</span>
-      </Link>
+      {!isAnonymous && (
+        <Link
+          to="/form"
+          className="fixed top-8 right-4 bg-green-400 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md"
+        >
+          <span className="text-2xl">+</span>
+        </Link>
+      )}
 
       <p className="text-xs text-center mb-2">日付からイベントを検索</p>
       <p className="text-xs text-center mb-4">まずは暇な日をタップ</p>
@@ -102,6 +113,9 @@ const Top = () => {
         height="auto"
         dayCellContent={(args) => args.date.getDate()}
       />
+      {isAnonymous && (
+        <p className="text-sm text-center mt-4 text-red-800">※イベントの登録は<a href="/signup" className="text-blue-500">サインアップ</a>が必要です</p>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import { doc, getDoc, updateDoc, collection, addDoc, Timestamp } from "firebase/firestore";
 import { registerLocale } from "react-datepicker";
 import ja from "date-fns/locale/ja";
@@ -53,6 +53,16 @@ const EventFormPage = () => {
 
     fetchEventData();
   }, [eventId]);
+
+  useEffect(() => {
+    const checkUser = () => {
+      // 匿名ユーザーの場合、トップへリダイレクト
+      if (auth.currentUser && auth.currentUser.isAnonymous) {
+        navigate("/");
+      }
+    };
+    checkUser();
+  }, [navigate]);
 
   // イベント一覧の日付を受け取り開催日の初期値に設定
   const location = useLocation();

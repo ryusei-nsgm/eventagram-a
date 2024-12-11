@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useLocation, Link, useNavigate } from "react-router-dom";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import { collection, doc, getDoc, addDoc, deleteDoc, query, orderBy, getDocs } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 
@@ -12,6 +12,7 @@ const EventDetailPage = () => {
   const [name, setName] = useState(""); // コメントを入力した人の名前
   const { currentUser } = useContext(AuthContext);
   const uid = currentUser?.uid; 
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
@@ -55,6 +56,15 @@ const EventDetailPage = () => {
     fetchEvent();
     fetchComments();
   }, [eventId]);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsAnonymous(user.isAnonymous); // 匿名ログインかを判定
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleCommentSubmit = async () => {
     if (newComment.trim() === "") return;
@@ -299,40 +309,42 @@ const EventDetailPage = () => {
         </div>
       )}
 
-      {/* コメント入力フォーム */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white p-2 border-t flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="コメントを入力... ※140字以内"
-          className="flex-1 border rounded-lg p-2 focus:outline-none sm:max-w-xs resize-none overflow-auto"
-          rows={1}
-          maxLength="140"
-          onInput={(e) => {
-            e.target.style.height = 'auto';
-            e.target.style.height = `${e.target.scrollHeight}px`}}
-          required
-        />
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="名前を入力..."
-            className="flex-1 border rounded-lg p-2 focus:outline-none"
-            maxLength="10"
+      {!isAnonymous && ( <>
+        {/* コメント入力フォーム */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-2 border-t flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="コメントを入力... ※140字以内"
+            className="flex-1 border rounded-lg p-2 focus:outline-none sm:max-w-xs resize-none overflow-auto"
+            rows={1}
+            maxLength="140"
+            onInput={(e) => {
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`}}
             required
           />
-          <button
-            onClick={handleCommentSubmit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-            </svg>
-          </button>
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="名前を入力..."
+              className="flex-1 border rounded-lg p-2 focus:outline-none"
+              maxLength="10"
+              required
+            />
+            <button
+              onClick={handleCommentSubmit}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      </> )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { auth, signInWithEmailAndPassword } from "../firebase";
+import { auth, signInWithEmailAndPassword, signInAnonymously } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
@@ -26,6 +26,17 @@ const LoginPage = () => {
     } catch (error) {
       console.error("ログインエラー:", error);
       setError("メールアドレスまたはパスワードが正しくありません。");
+    }
+  };
+
+  // 匿名ログイン
+  const handleAnonymousLogin = async () => {
+    try {
+      await signInAnonymously(auth);
+      navigate("/"); // 匿名ログイン成功後トップページに移動
+    } catch (error) {
+      console.error("匿名ログインエラー:", error);
+      setError("匿名ログインに失敗しました。");
     }
   };
 
@@ -68,6 +79,21 @@ const LoginPage = () => {
         <p className="text-center mt-4">
           新規ユーザーですか？ <a href="/signup" className="text-blue-500">サインアップ</a>
         </p>
+
+        <div className="mt-4">
+          <p className="text-center mt-4 mb-4">
+            OR
+          </p>
+          <p className="text-center mt-4 mb-2">
+            ログインせずに・・・
+          </p>
+          <button
+            onClick={handleAnonymousLogin}
+            className="w-full py-2 px-4 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 transition"
+          >
+            とりあえずみてみる
+          </button>
+        </div>
       </div>
     </div>
   );

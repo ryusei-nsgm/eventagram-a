@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import { collection, query, where, getDocs, Timestamp, orderBy } from "firebase/firestore";
 
 const EventListPage = () => {
@@ -8,6 +8,7 @@ const EventListPage = () => {
   const selectedDate = new Date(date);
   const [events, setEvents] = useState([]); // イベントデータを管理するためのstate
   const [loading, setLoading] = useState(true); // データが読み込まれるまでのローディング状態を管理
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const formattedDate = selectedDate.toLocaleDateString("ja-JP", {
     weekday: "short",
@@ -42,6 +43,15 @@ const EventListPage = () => {
 
     fetchEvents();
   }, [date]);
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsAnonymous(user.isAnonymous); // 匿名ログインかを判定
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleEventClick = (eventId) => {
     navigate(`/event/${eventId}`, { state: { date: selectedDate } }); // イベント詳細画面へ遷移
@@ -53,14 +63,15 @@ const EventListPage = () => {
         <span className="mr-2">&lt;</span>
       </Link>
       <h1 className="text-3xl font-bold text-center mb-8">{formattedDate}</h1>
-
-      <Link
-        to="/form"
-        state={{ date: selectedDate }}
-        className="fixed top-8 right-6 bg-green-400 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md"
-      >
-        <span className="text-2xl">+</span>
-      </Link>
+      {!isAnonymous && (
+        <Link
+          to="/form"
+          state={{ date: selectedDate }}
+          className="fixed top-8 right-6 bg-green-400 text-white w-12 h-12 flex items-center justify-center rounded-full shadow-md"
+        >
+          <span className="text-2xl">+</span>
+        </Link>
+      )}
 
       {/* ローディング中の場合 */}
       {loading ? (
