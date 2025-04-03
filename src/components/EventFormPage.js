@@ -238,7 +238,6 @@ const EventFormPage = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={140}
-            required
           />
         </div>
 

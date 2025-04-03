@@ -14,23 +14,9 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/" element={<Top />} />
+        <Route path="/events/:date" element={<EventListPage />} />
         
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Top />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/events/:date"
-          element={
-            <PrivateRoute>
-              <EventListPage />
-            </PrivateRoute>
-          }
-        />
         <Route
           path="/form"
           element={
@@ -49,14 +35,7 @@ const App = () => {
           } 
         />
 
-        <Route
-          path="/event/:eventId"
-          element={
-            <PrivateRoute>
-              <EventDetailPage />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/event/:eventId" element={<EventDetailPage />}/>
       </Routes>
     </Router>
   );
